@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NetForSpeech — {% block pagetitle %}Page-specific part of title here{% endblock %}</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'nfsmain/css/nfsmain.css' %}" />
+</head>
+
+<body>
+    <div><strong>Навигация:</strong> <a href="{% url 'main:index' %}">Стартовая страница</a> |
+    <a href="{% url 'admin:index' %}">Django admin</a></div>
+<hr />
+
+{% for message in messages %}
+    <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>Action result: {{ message }}</div>
+{% endfor %}
+
+<div>{% block pagebody %}Page body here{% endblock %}</div>
+<!-- <div>{% debug %}</div> -->
+</body>
+</html>

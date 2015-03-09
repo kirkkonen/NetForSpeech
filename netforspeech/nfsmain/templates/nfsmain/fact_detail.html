@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block pagetitle %}Факт{% endblock %}
+{% block pagebody %}
+    <h1>Факт</h1>
+    «{{ fact.text }}»<br />
+    Получен из <a href = "{{ fact.source_url }}">{{ fact.media }}</a><br />
+    Размещён: {{ fact.timestamp }}
+{% endblock %}
