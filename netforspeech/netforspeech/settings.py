@@ -56,7 +56,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'netforspeech.urls'
+ROOT_URLCONF = 'netforspeech.netforspeech.urls'
 
 TEMPLATES = [
     {
