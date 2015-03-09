@@ -3,7 +3,7 @@
 {% block pagebody %}
     <h1>Факты</h1>
     {% for fact in fact_list %}
-        «{{ fact.text }}» <br />
-        от <a href = "{{ fact.media.home_url }}">{{ fact.media }}</a>
+        <p><a href = "{% url 'fact_view' fact.id %}">«{{ fact.text|truncatewords:10 }}»</a><br />
+        от <a href = "{{ fact.media.home_url }}">{{ fact.media }}</a></p>
     {% endfor %}
 {% endblock %}
