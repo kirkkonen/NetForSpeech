@@ -40,7 +40,7 @@ DJANGO_APPS = (
 )
 
 HOMEBREW_APPS = (
-    'netforspeech.netforspeech.nfsmain',
+    'netforspeech.nfsmain',
 )
 
 INSTALLED_APPS = DJANGO_APPS + HOMEBREW_APPS
