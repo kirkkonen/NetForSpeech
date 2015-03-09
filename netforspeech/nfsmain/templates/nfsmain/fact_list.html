@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block pagetitle %}Список фактов{% endblock %}
+{% block pagebody %}
+    <h1>Факты</h1>
+    {% for fact in fact_list %}
+        «{{ fact.text }}» <br />
+        от <a href = "{{ fact.media.home_url }}">{{ fact.media }}</a>
+    {% endfor %}
+{% endblock %}
