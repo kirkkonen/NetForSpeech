@@ -1,1 +1,1 @@
-web: python netforspeech/manage.py runserver 0.0.0.0:$PORT
+web: gunicorn netforspeech.netforspeech.wsgi --log-file -

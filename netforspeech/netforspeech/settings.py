@@ -111,6 +111,9 @@ STATIC_URL = '/static/'
 
 
 # EXPERIMENTAL PRODUCTION SETTINGS
+import dj_database_url
+DATABASES['default'] =  dj_database_url.config()
+
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
 
