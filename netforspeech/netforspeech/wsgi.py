@@ -11,7 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "netforspeech.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "netforspeech.netforspeech.settings")
 
 # application = get_wsgi_application()
 # replaced in favour of:
