@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import CreateView, ListView, DetailView
 
-from nfsmain.models import *
 from nfsmain.forms import *
 
 
