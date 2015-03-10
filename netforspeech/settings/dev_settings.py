@@ -1,4 +1,4 @@
-from netforspeech.settings import *
+from netforspeech.settings.base_settings import *
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/

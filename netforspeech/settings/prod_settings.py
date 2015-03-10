@@ -1,4 +1,4 @@
-from netforspeech.settings import *
+from netforspeech.settings.base_settings import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # TODO Test without it
