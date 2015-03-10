@@ -26,6 +26,5 @@ DATABASES = {
 # Static asset configuration
 # STATIC_ROOT isn't used
 
-# Heroku-recommended settings
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Additional locations of static files
+# STATICFILES_DIRS isn't used

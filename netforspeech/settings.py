@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(PROJECT_DIR)
 
 # SECRET_KEY - see environment specific settings
 
@@ -76,7 +77,7 @@ WSGI_APPLICATION = 'netforspeech.wsgi.application'
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -86,6 +87,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+# ADMINS, MANAGERS и LOGGING нужно разместить здесь (или в отдельных настройках для сред)
+
+# MEDIA_ROOT и MEDIA_URL могут быть здесь или в отдельных настройках для сред
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/dev/howto/static-files/

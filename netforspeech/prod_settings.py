@@ -16,6 +16,8 @@ ALLOWED_HOSTS = ['*']
 # TODO Change to host-specific:
 # ALLOWED_HOSTS = ['netforspeech.herokuapp.com']
 
+# INSTALLED_APPS are listed in the base settings
+
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
@@ -33,5 +35,9 @@ STATICFILES_DIRS = (
 # TODO Enable with HTTPS:
 # CSRF_COOKIE_SECURE = True
 # SESSION_COOKIE_SECURE = True
+
+# Heroku-recommended settings
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # TODO See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/ for production optimisations
