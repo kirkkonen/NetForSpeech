@@ -1,9 +1,5 @@
 from netforspeech.settings.base_settings import *
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-# TODO Test without it
-# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '3tvox+5tih&+#1s%dn*qc8!nph+54uxci21j_4qm1(w71(v9mj'
 # TODO Get SECRET_KEY from env variable
@@ -12,9 +8,7 @@ SECRET_KEY = '3tvox+5tih&+#1s%dn*qc8!nph+54uxci21j_4qm1(w71(v9mj'
 DEBUG = False
 
 # Allow all host headers
-ALLOWED_HOSTS = ['*']
-# TODO Change to host-specific:
-# ALLOWED_HOSTS = ['netforspeech.herokuapp.com']
+ALLOWED_HOSTS = ['netforspeech.herokuapp.com']
 
 # INSTALLED_APPS are listed in the base settings
 
@@ -32,9 +26,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-# TODO Enable with HTTPS:
-# CSRF_COOKIE_SECURE = True
-# SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # Heroku-recommended settings
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
