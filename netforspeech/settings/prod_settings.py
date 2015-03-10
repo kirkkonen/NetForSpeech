@@ -2,7 +2,7 @@ from netforspeech.settings.base_settings import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # TODO Test without it
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '3tvox+5tih&+#1s%dn*qc8!nph+54uxci21j_4qm1(w71(v9mj'
