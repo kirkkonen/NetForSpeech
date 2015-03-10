@@ -1,4 +1,4 @@
-Django==1.8b1
+-r requirements/base-requirements.txt
 dj-database-url==0.3.0
 dj-static==0.0.6
 gunicorn==19.1.1
