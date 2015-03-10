@@ -40,7 +40,7 @@ DJANGO_APPS = (
 )
 
 HOMEBREW_APPS = (
-    'nfsmain',
+    'netforspeech.nfsmain',
 )
 
 INSTALLED_APPS = DJANGO_APPS + HOMEBREW_APPS
@@ -56,7 +56,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'netforspeech.urls'
+ROOT_URLCONF = 'netforspeech.netforspeech.urls'
 
 TEMPLATES = [
     {
@@ -108,3 +108,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# EXPERIMENTAL PRODUCTION SETTINGS
+import dj_database_url
+DATABASES['default'] =  dj_database_url.config()
+
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Allow all host headers
+ALLOWED_HOSTS = ['*']
+
+# Static asset configuration
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = 'staticfiles'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)

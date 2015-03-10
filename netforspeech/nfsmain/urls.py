@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from nfsmain import views
+from netforspeech.nfsmain import views
 
 urlpatterns = \
     patterns('',

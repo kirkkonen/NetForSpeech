@@ -1,4 +1,4 @@
 from django import forms
 
-from nfsmain.models import *
+from netforspeech.nfsmain.models import *
 

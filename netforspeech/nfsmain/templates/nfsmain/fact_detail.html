@@ -2,7 +2,7 @@
 {% block pagetitle %}Факт{% endblock %}
 {% block pagebody %}
     <h1>Факт</h1>
-    «{{ fact.text }}»<br />
+    <p>«{{ fact.text }}»<br />
     Получен из <a href = "{{ fact.source_url }}">{{ fact.media }}</a><br />
-    Размещён: {{ fact.timestamp }}
+    Размещён: {{ fact.timestamp }}</p>
 {% endblock %}
