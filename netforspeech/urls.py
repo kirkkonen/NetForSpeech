@@ -7,5 +7,5 @@ urlpatterns = [
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('netforspeech.nfsmain.urls', namespace='main'))
+    url(r'^', include('nfsmain.urls', namespace='main'))
 ]
