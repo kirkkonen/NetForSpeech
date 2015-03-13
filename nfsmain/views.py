@@ -20,3 +20,8 @@ class FactListView(ListView):
 
 class FactDetailView(DetailView):
     model = Fact
+
+
+class SpeakerCreateView(CreateView):
+    model = Speaker
+    fields = ['index_name', 'secondary_names', 'other_names', 'birth_date', 'city', 'current_work', 'previous_work']

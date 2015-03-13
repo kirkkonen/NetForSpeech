@@ -7,5 +7,6 @@ urlpatterns = \
              url(r'^$', views.index, name='index'),
              url(r'^facts/$', views.FactListView.as_view(), name='fact_list'),
              url(r'^facts/add/$', views.FactCreateView.as_view(), name='fact_add'),
-             url(r'^facts/(?P<pk>\d+)$', views.FactDetailView.as_view(), name='fact_view')
+             url(r'^facts/(?P<pk>\d+)$', views.FactDetailView.as_view(), name='fact_view'),
+             url(r'^speakers/add/$', views.SpeakerCreateView.as_view(), name='speaker_add')
              )
