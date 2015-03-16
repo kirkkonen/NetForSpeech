@@ -33,7 +33,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
-THIRDPARTY_APPS = ['cities_light']
+THIRDPARTY_APPS = []
 
 HOMEBREW_APPS = [
     'nfsmain',
