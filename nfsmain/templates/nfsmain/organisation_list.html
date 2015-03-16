@@ -1,0 +1,8 @@
+{% extends "nfsmain/base.html" %}
+{% block pagetitle %}Список организаций{% endblock %}
+{% block pagebody %}
+    <h1>Организации</h1>
+    {% for organisation in organisation_list %}
+        <p><a href = "{% url 'main:organisation_detail' organisation.id %}">{{ organisation }}</a></p>
+    {% endfor %}
+{% endblock %}

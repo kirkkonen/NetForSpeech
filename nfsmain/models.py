@@ -6,6 +6,11 @@ from datetime import date
 # Create your models here.
 
 
+class ManagedEntity():
+    # submitted_by = models.ForeignKey()
+    submitted_at = models.DateField(auto_now_add=True)
+
+
 class Organisation(models.Model):
     name = models.CharField(max_length=512)
 

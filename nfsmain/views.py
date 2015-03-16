@@ -1,12 +1,18 @@
 from django.shortcuts import render
 from django.views.generic import CreateView, ListView, DetailView
+from django.contrib.auth.decorators import login_required
 
 from nfsmain.forms import *
 
 
-def index(requst):
+def index(request):
     template_name = "nfsmain/index.html"
-    return render(requst, template_name)
+    return render(request, template_name)
+
+@login_required()
+def admin(request):
+    template_name = "nfsmain/admin.html"
+    return render(request, template_name)
 
 
 class FactCreateView(CreateView):
@@ -46,3 +52,16 @@ class StatementListView(ListView):
 
 class StatementDetailView(DetailView):
     model = Statement
+
+
+class OrganisationCreateView(CreateView):
+    model = Organisation
+    fields = ['name']
+
+
+class OrganisationListView(CreateView):
+    model = Organisation
+
+
+class OrganisationDetailView(CreateView):
+    model = Organisation
