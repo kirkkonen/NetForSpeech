@@ -17,6 +17,9 @@ class Organisation(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('main:organisation_detail', kwargs={'pk': self.pk})
+
 
 class Media(models.Model):
     name = models.CharField(max_length=512, default='[ИМЯ НЕ ПРИСВОЕНО]')

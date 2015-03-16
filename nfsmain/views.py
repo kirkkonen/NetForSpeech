@@ -59,9 +59,9 @@ class OrganisationCreateView(CreateView):
     fields = ['name']
 
 
-class OrganisationListView(CreateView):
+class OrganisationListView(ListView):
     model = Organisation
 
 
-class OrganisationDetailView(CreateView):
+class OrganisationDetailView(DetailView):
     model = Organisation
