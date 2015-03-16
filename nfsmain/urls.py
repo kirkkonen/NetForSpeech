@@ -7,6 +7,11 @@ urlpatterns = \
              url(r'^$', views.index, name='index'),
              url(r'^facts/$', views.FactListView.as_view(), name='fact_list'),
              url(r'^facts/add/$', views.FactCreateView.as_view(), name='fact_add'),
-             url(r'^facts/(?P<pk>\d+)$', views.FactDetailView.as_view(), name='fact_view'),
-             url(r'^speakers/add/$', views.SpeakerCreateView.as_view(), name='speaker_add')
+             url(r'^facts/(?P<pk>\d+)$', views.FactDetailView.as_view(), name='fact_detail'),
+             url(r'^speakers/$', views.SpeakerListView.as_view(), name='speaker_list'),
+             url(r'^speakers/add/$', views.SpeakerCreateView.as_view(), name='speaker_add'),
+             url(r'^speakers/(?P<pk>\d+)$', views.SpeakerDetailView.as_view(), name='speaker_detail'),
+             url(r'^statements/$', views.StatementListView.as_view(), name='statement_list'),
+             url(r'^statements/add/$', views.StatementCreateView.as_view(), name='statement_add'),
+             url(r'^statements/(?P<pk>\d+)$', views.StatementDetailView.as_view(), name='statement_detail'),
              )

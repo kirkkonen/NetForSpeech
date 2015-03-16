@@ -33,13 +33,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
-THIRDPARTY_APPS = [
-    'cities_light'
-]
-
-# Cities_light setting
-CITIES_LIGHT_TRANSLATION_LANGUAGES = ['ru', 'abbr']
-CITIES_LIGHT_INCLUDE_COUNTRIES = ['RU', 'UA']
+THIRDPARTY_APPS = ['cities_light']
 
 HOMEBREW_APPS = [
     'nfsmain',

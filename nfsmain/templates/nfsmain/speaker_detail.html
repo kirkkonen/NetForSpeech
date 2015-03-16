@@ -1,0 +1,12 @@
+{% extends "nfsmain/base.html" %}
+{% block pagetitle %}Спикер{% endblock %}
+{% block pagebody %}
+    <h1>Спикер</h1>
+    <p>{{ speaker }}</p>
+    <p>Родился {{ speaker.birth_date }} </p>
+    <p>Сейчас работает на {{ speaker.current_work }}</p>
+    <p>Раньше работал:</p>
+    <ul>{% for work in speaker.previous_work.all %}
+    <li>{{ work }}</li>
+    {% endfor %}</ul>
+{% endblock %}

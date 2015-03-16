@@ -11,7 +11,7 @@ def index(requst):
 
 class FactCreateView(CreateView):
     model = Fact
-    fields = ['text', 'source_url']
+    fields = ['text', 'datestamp', 'timestamp', 'source_url']
 
 
 class FactListView(ListView):
@@ -24,4 +24,25 @@ class FactDetailView(DetailView):
 
 class SpeakerCreateView(CreateView):
     model = Speaker
-    fields = ['index_name', 'secondary_names', 'other_names', 'birth_date', 'city', 'current_work', 'previous_work']
+    fields = ['index_name', 'secondary_names', 'other_names', 'birth_date', 'current_work', 'previous_work']
+
+
+class SpeakerListView(ListView):
+    model = Speaker
+
+
+class SpeakerDetailView(DetailView):
+    model = Speaker
+
+
+class StatementCreateView(CreateView):
+    model = Statement
+    fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
+
+
+class StatementListView(ListView):
+    model = Statement
+
+
+class StatementDetailView(DetailView):
+    model = Statement

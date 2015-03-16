@@ -3,6 +3,5 @@
 {% block pagebody %}
     <h1>Факт</h1>
     <p>«{{ fact.text }}»<br />
-    Получен из <a href = "{{ fact.source_url }}">{{ fact.media }}</a><br />
-    Размещён: {{ fact.timestamp }}</p>
+    Обнародован {{ fact.datestamp }} в <a href = "{{ fact.source_url }}">{{ fact.media }}</a></p>
 {% endblock %}

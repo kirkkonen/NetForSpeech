@@ -2,6 +2,21 @@
 {% block pagetitle %}Главная страница{% endblock %}
 {% block pagebody %}
     <h1>Добро пожаловать в  NetForSpeech!</h1>
-    <a href="{% url 'main:fact_add' %}">Добавить факт</a> <br />
-    <a href="{% url 'main:fact_list' %}">Список фактов</a>
+    <h2>Факты</h2>
+    <ul>
+        <li><a href="{% url 'main:fact_add' %}">Добавить факт</a></li>
+        <li><a href="{% url 'main:fact_list' %}">Список фактов</a></li>
+    </ul>
+    <h2>Спикеры</h2>
+    <ul>
+        <li><a href="{% url 'main:speaker_add' %}">Добавить спикера</a></li>
+        <li><a href="{% url 'main:speaker_list' %}">Список спикеров</a></li>
+    </ul>
+    <h2>Высказывания</h2>
+    <ul>
+        <li><a href="{% url 'main:statement_add' %}">Добавить высказывание</a></li>
+        <li><a href="{% url 'main:statement_list' %}">Список высказываний</a></li>
+    </ul>
+
+
 {% endblock %}

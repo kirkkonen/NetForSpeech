@@ -1,0 +1,8 @@
+{% extends "nfsmain/base.html" %}
+{% block pagetitle %}Список спикеров{% endblock %}
+{% block pagebody %}
+    <h1>Спикеры</h1>
+    {% for speaker in speaker_list %}
+        <p><a href = "{% url 'main:speaker_detail' speaker.id %}">{{ speaker }}</a></p>
+    {% endfor %}
+{% endblock %}
