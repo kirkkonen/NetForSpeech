@@ -4,4 +4,15 @@
     <h1>Факт</h1>
     <p>«{{ fact.text }}»<br />
     Обнародован {{ fact.datestamp }} в <a href = "{{ fact.source_url }}">{{ fact.media }}</a></p>
+    <h3>Связанные факты</h3>
+    {% for rel_fact in fact.facts_fst_set.all %}
+        {{ rel_fact.fact_2 }} - {{ rel_fact.get_relation_type_display }}
+    {% endfor %}
+    {% for rel_fact in fact.facts_snd_set.all %}
+        {{ rel_fact.fact }} - {{ rel_fact.get_relation_type_display }}
+    {% endfor %}
+    <h3>Связанные высказывания</h3>
+    {% for rel_smnt in fact.factstatementrelation_set.all %}
+        {{ rel_smnt.statement }} - {{ rel_smnt.get_relation_type_display }}
+    {% endfor %}
 {% endblock %}

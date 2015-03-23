@@ -17,7 +17,24 @@ def admin(request):
 
 class FactCreateView(CreateView):
     model = Fact
-    fields = ['text', 'datestamp', 'timestamp', 'source_url', 'statements', 'facts']
+    fields = ['text', 'datestamp', 'timestamp', 'source_url']
+
+    def get_context_data(self, **kwargs):
+        context = super(FactCreateView, self).get_context_data(**kwargs)
+        context['fact_fact_formset'] = FactFactFormset(self.request.POST or None)
+        context['fact_statement_formset'] = FactStatementFormset(self.request.POST or None)
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save()
+        fact_fact_formset = FactFactFormset(self.request.POST, instance=self.object)
+        if fact_fact_formset.is_valid():
+            fact_fact_formset.save()
+        fact_statement_formset = FactStatementFormset(self.request.POST, instance=self.object)
+        if fact_statement_formset.is_valid():
+            fact_statement_formset.save()
+        return super(FactCreateView, self).form_valid(form)
+
 
 class FactListView(ListView):
     model = Fact

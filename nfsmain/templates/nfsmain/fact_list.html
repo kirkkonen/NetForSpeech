@@ -4,6 +4,7 @@
     <h1>Факты</h1>
     {% for fact in fact_list %}
         <p><a href = "{% url 'main:fact_detail' fact.id %}">«{{ fact.text|truncatewords:10 }}»</a><br />
-        от <a href = "{{ fact.media.home_url }}">{{ fact.media }}</a></p>
+        от <a href = "{{ fact.media.home_url }}">{{ fact.media }}</a><br />
+        {{ fact.related }}</p>
     {% endfor %}
 {% endblock %}

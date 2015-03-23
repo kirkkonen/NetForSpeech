@@ -89,6 +89,7 @@ class Record(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
+        # Сначала проверяем, существует ли СМИ, если нужно - создаём
         medias = Media.objects.all()
 
         for media in medias:
@@ -100,6 +101,22 @@ class Record(models.Model):
 
         self.media = media
         super(Record, self).save(*args, **kwargs)
+
+    @property
+    def union_fact_relation(self):
+        return self.facts_fst_set.all() | self.facts_snd_set.all()
+
+    def related_count(self):
+        return (
+            self.union_fact_relation.filter(relation_type='C').count(),
+            self.factstatementrelation_set.filter(relation_type='C').count(),
+            self.union_fact_relation.filter(relation_type='A').count(),
+            self.factstatementrelation_set.filter(relation_type='A').count(),
+        )
+
+    def related(self):
+        return 'Противоречивых фактов: {}, высказываний: {}.' \
+               ' Подтверждающих фактов: {}, высказываний: {}'.format(*self.related_count())
 
 
 class Statement(Record):
