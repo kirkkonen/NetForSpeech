@@ -17,8 +17,7 @@ def admin(request):
 
 class FactCreateView(CreateView):
     model = Fact
-    fields = ['text', 'datestamp', 'timestamp', 'source_url']
-
+    fields = ['text', 'datestamp', 'timestamp', 'source_url', 'statements', 'facts']
 
 class FactListView(ListView):
     model = Fact
@@ -43,7 +42,8 @@ class SpeakerDetailView(DetailView):
 
 class StatementCreateView(CreateView):
     model = Statement
-    fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
+    fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag', 'statements',
+              'facts']
 
 
 class StatementListView(ListView):

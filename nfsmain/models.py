@@ -6,7 +6,7 @@ from datetime import date
 # Create your models here.
 
 
-class ManagedEntity():
+class ManagedEntityMixIn():
     # submitted_by = models.ForeignKey()
     submitted_at = models.DateField(auto_now_add=True)
 
@@ -102,7 +102,24 @@ class Record(models.Model):
         super(Record, self).save(*args, **kwargs)
 
 
+class Statement(Record):
+    theme_tag = models.CharField(max_length=256, blank=True)
+    speaker = models.ForeignKey(Speaker)
+    communication = models.CharField(max_length=256, blank=True)
+    # communication = models.ForeignKey(Communication)
+    statements = models.ManyToManyField('self', blank=True, through='StatementStatementRelation', symmetrical=False)
+
+    def __str__(self):
+        return '«{}...» от {}'.format(self.text[:50], self.speaker)
+
+    def get_absolute_url(self):
+        return reverse('main:statement_detail', kwargs={'pk': self.pk})
+
+
 class Fact(Record):
+    statements = models.ManyToManyField(Statement, blank=True, through='FactStatementRelation')
+    facts = models.ManyToManyField('self', blank=True, through='FactFactRelation', symmetrical=False)
+
     def __str__(self):
         return '«{}...» от {}'.format(self.text[:50], self.media)
 
@@ -110,14 +127,32 @@ class Fact(Record):
         return reverse('main:fact_detail', kwargs={'pk': self.pk})
 
 
-class Statement(Record):
-    theme_tag = models.CharField(max_length=256, blank=True)
-    speaker = models.ForeignKey(Speaker)
-    communication = models.CharField(max_length=256, blank=True)
-    # communication = models.ForeignKey(Communication)
+class RecordRelation(models.Model):
+    relation_type = models.CharField(choices=[('C', 'Противоречит'), ('A', 'Соответствует')], max_length=1)
 
-    def __str__(self):
-        return '«{}...» от {}'.format(self.text[:50], self.speaker)
+    class Meta:
+        abstract = True
 
-    def get_absolute_url(self):
-        return reverse('main:statement_detail', kwargs={'pk': self.pk})
+
+class FactStatementRelation(RecordRelation):
+    statement = models.ForeignKey(Statement)
+    fact = models.ForeignKey(Fact)
+
+    class Meta:
+        unique_together = ('statement', 'fact')
+
+
+class StatementStatementRelation(RecordRelation):
+    statement = models.ForeignKey(Statement, related_name='statements_fst_set')
+    statement_2 = models.ForeignKey(Statement, related_name='statements_snd_set')
+
+    class Meta:
+        unique_together = ('statement', 'statement_2')
+
+
+class FactFactRelation(RecordRelation):
+    fact = models.ForeignKey(Fact, related_name='facts_fst_set')
+    fact_2 = models.ForeignKey(Fact, related_name='facts_snd_set')
+
+    class Meta:
+        unique_together = ('fact', 'fact_2')
