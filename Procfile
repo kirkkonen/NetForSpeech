@@ -1,1 +1,1 @@
-web: gunicorn netforspeech.netforspeech.wsgi --log-file -
+web: gunicorn netforspeech.wsgi --log-file -

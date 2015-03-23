@@ -1,0 +1,10 @@
+{% extends "nfsmain/base.html" %}
+{% block pagetitle %}Добавить организацию{% endblock %}
+{% block pagebody %}
+    <h1>Данные организации</h1>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Добавить" />
+        </form>
+{% endblock %}

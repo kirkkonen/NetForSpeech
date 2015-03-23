@@ -1,0 +1,13 @@
+{% extends "nfsmain/base.html" %}
+{% block pagetitle %}Высказывание{% endblock %}
+{% block pagebody %}
+    <h1>Высказывание</h1>
+    <p>«{{ statement.text }}»<br />
+    Заявил <a href = "{% url 'main:speaker_detail' statement.speaker.id %}">{{ statement.speaker }}</a>
+        (@ {{ statement.communication }})<br />
+    Обнародован {{ statement.datestamp }} в <a href = "{{ statement.source_url }}">{{ statement.media }}</a></p>
+    <p>Связанные темы:</p>
+    <ul>
+        <li>{{ statement.theme_tag }}</li>
+    </ul>
+{% endblock %}

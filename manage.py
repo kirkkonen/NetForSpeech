@@ -3,7 +3,10 @@ import os
 import sys
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "netforspeech.settings")
+    # Production settings must be set via environmental variable
+    # Running production with dev settings should fail due to lack of dev modules, which are
+    # not listed in requirements.txt
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "netforspeech.settings.dev_settings")
 
     from django.core.management import execute_from_command_line
 

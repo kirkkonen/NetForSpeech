@@ -1,7 +1,24 @@
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.utils import timezone
+from datetime import date
 
 # Create your models here.
+
+
+class ManagedEntity():
+    # submitted_by = models.ForeignKey()
+    submitted_at = models.DateField(auto_now_add=True)
+
+
+class Organisation(models.Model):
+    name = models.CharField(max_length=512)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('main:organisation_detail', kwargs={'pk': self.pk})
 
 
 class Media(models.Model):
@@ -13,17 +30,63 @@ class Media(models.Model):
         return self.name
 
 
-class Fact(models.Model):
-    text = models.TextField()
-    source_url = models.CharField(max_length=2048)
-    timestamp = models.DateTimeField(auto_now_add=True, editable=False)
-    media = models.ForeignKey(Media, blank=True)
+class Event(models.Model):
+    name = models.CharField(max_length=512)
+
+
+class Communication(models.Model):
+    pass
+
+
+class CommunicationMixIn():
+    # FIXME Makemigrations throws and error when moving O2OField comm to the mixin
+
+    def save(self, *args, **kwargs):
+        if not self.comm_id:
+            comm = Communication()
+            comm.save()
+            self.comm = comm
+        return super().save(*args, **kwargs)
+
+
+class Interview(CommunicationMixIn, models.Model):
+    comm = models.OneToOneField(Communication, primary_key=True, blank=True)
+    origin = models.ForeignKey(Media)
+
+
+class Speech(CommunicationMixIn, models.Model):
+    comm = models.OneToOneField(Communication, primary_key=True, blank=True)
+    origin = models.ForeignKey(Event)
+
+
+class Speaker(models.Model):
+    index_name = models.CharField(max_length=256)
+    secondary_names = models.CharField(max_length=256)
+    other_names = models.CharField(max_length=256, blank=True)
+    birth_date = models.DateField(blank=True, null=True)
+    current_work = models.ForeignKey(Organisation, blank=True, related_name='employee_current_set')
+    previous_work = models.ManyToManyField(Organisation, blank=True, related_name='employee_former_set')
 
     def __str__(self):
-        return '«{}...» от {}'.format(self.text[:50], self.media)
+        return ' '.join([self.index_name, self.secondary_names, self.other_names])
 
     def get_absolute_url(self):
-        return reverse('main:fact_view', kwargs={'pk': self.pk})
+        return reverse('main:speaker_detail', kwargs={'pk': self.pk})
+
+
+class ThemeTag(models.Model):
+    caption = models.CharField(max_length=128)
+
+
+class Record(models.Model):
+    text = models.TextField()
+    datestamp = models.DateField(default=timezone.now)
+    timestamp = models.TimeField(blank=True, null=True)
+    source_url = models.CharField(max_length=2048)
+    media = models.ForeignKey(Media, blank=True)
+
+    class Meta:
+        abstract = True
 
     def save(self, *args, **kwargs):
         medias = Media.objects.all()
@@ -36,4 +99,25 @@ class Fact(models.Model):
             media.save()
 
         self.media = media
-        super(Fact, self).save(*args, **kwargs)
+        super(Record, self).save(*args, **kwargs)
+
+
+class Fact(Record):
+    def __str__(self):
+        return '«{}...» от {}'.format(self.text[:50], self.media)
+
+    def get_absolute_url(self):
+        return reverse('main:fact_detail', kwargs={'pk': self.pk})
+
+
+class Statement(Record):
+    theme_tag = models.CharField(max_length=256, blank=True)
+    speaker = models.ForeignKey(Speaker)
+    communication = models.CharField(max_length=256, blank=True)
+    # communication = models.ForeignKey(Communication)
+
+    def __str__(self):
+        return '«{}...» от {}'.format(self.text[:50], self.speaker)
+
+    def get_absolute_url(self):
+        return reverse('main:statement_detail', kwargs={'pk': self.pk})

@@ -11,11 +11,9 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "netforspeech.netforspeech.settings")
-
-# application = get_wsgi_application()
-# replaced in favour of:
-
-from dj_static import Cling
-
-application = Cling(get_wsgi_application())
+# May be it is better to set a special env on Heroku
+if 'DYNO' in os.environ:
+    from dj_static import Cling
+    application = Cling(get_wsgi_application())
+else:
+    application = get_wsgi_application()

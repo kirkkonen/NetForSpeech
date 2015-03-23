@@ -1,18 +1,23 @@
 from django.shortcuts import render
 from django.views.generic import CreateView, ListView, DetailView
+from django.contrib.auth.decorators import login_required
 
-from netforspeech.nfsmain.models import *
-from netforspeech.nfsmain.forms import *
+from nfsmain.forms import *
 
 
-def index(requst):
+def index(request):
     template_name = "nfsmain/index.html"
-    return render(requst, template_name)
+    return render(request, template_name)
+
+@login_required()
+def admin(request):
+    template_name = "nfsmain/admin.html"
+    return render(request, template_name)
 
 
 class FactCreateView(CreateView):
     model = Fact
-    fields = ['text', 'source_url']
+    fields = ['text', 'datestamp', 'timestamp', 'source_url']
 
 
 class FactListView(ListView):
@@ -21,3 +26,42 @@ class FactListView(ListView):
 
 class FactDetailView(DetailView):
     model = Fact
+
+
+class SpeakerCreateView(CreateView):
+    model = Speaker
+    fields = ['index_name', 'secondary_names', 'other_names', 'birth_date', 'current_work', 'previous_work']
+
+
+class SpeakerListView(ListView):
+    model = Speaker
+
+
+class SpeakerDetailView(DetailView):
+    model = Speaker
+
+
+class StatementCreateView(CreateView):
+    model = Statement
+    fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
+
+
+class StatementListView(ListView):
+    model = Statement
+
+
+class StatementDetailView(DetailView):
+    model = Statement
+
+
+class OrganisationCreateView(CreateView):
+    model = Organisation
+    fields = ['name']
+
+
+class OrganisationListView(ListView):
+    model = Organisation
+
+
+class OrganisationDetailView(DetailView):
+    model = Organisation

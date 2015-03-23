@@ -1,1 +1,1 @@
-Django==1.8b1
+Django==1.8b2
