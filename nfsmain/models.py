@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from datetime import date
 
 # Create your models here.
 
@@ -77,7 +76,7 @@ class Speaker(models.Model):
 class ThemeTag(models.Model):
     caption = models.CharField(max_length=128)
 
-
+# TODO Убрать другую сторону related_name для всех наследников Record
 class Record(models.Model):
     text = models.TextField()
     datestamp = models.DateField(default=timezone.now)
@@ -102,15 +101,11 @@ class Record(models.Model):
         self.media = media
         super(Record, self).save(*args, **kwargs)
 
-    @property
-    def union_fact_relation(self):
-        return self.facts_fst_set.all() | self.facts_snd_set.all()
-
     def related_count(self):
         return (
-            self.union_fact_relation.filter(relation_type='C').count(),
+            self.facts_fst_set.filter(relation_type='C').count(),
             self.factstatementrelation_set.filter(relation_type='C').count(),
-            self.union_fact_relation.filter(relation_type='A').count(),
+            self.facts_fst_set.filter(relation_type='A').count(),
             self.factstatementrelation_set.filter(relation_type='A').count(),
         )
 
@@ -151,6 +146,10 @@ class RecordRelation(models.Model):
         abstract = True
 
 
+class SymmetricalRelationMixIn():
+    pass
+
+
 class FactStatementRelation(RecordRelation):
     statement = models.ForeignKey(Statement)
     fact = models.ForeignKey(Fact)
@@ -163,6 +162,15 @@ class StatementStatementRelation(RecordRelation):
     statement = models.ForeignKey(Statement, related_name='statements_fst_set')
     statement_2 = models.ForeignKey(Statement, related_name='statements_snd_set')
 
+    def save(self, *args, **kwargs):
+        if 'saving_reverse' not in StatementStatementRelation:
+            reverse_relation = FactFactRelation(statement=self.statement_2, statement_2=self.statement,
+                                                relation_type=self.relation_type)
+            kwargs['saving_reverse'] = True
+            reverse_relation.save(*args, **kwargs)
+        del kwargs['saving_reverse']
+        return super(StatementStatementRelation, self).save(self, *args, **kwargs)
+
     class Meta:
         unique_together = ('statement', 'statement_2')
 
@@ -170,6 +178,14 @@ class StatementStatementRelation(RecordRelation):
 class FactFactRelation(RecordRelation):
     fact = models.ForeignKey(Fact, related_name='facts_fst_set')
     fact_2 = models.ForeignKey(Fact, related_name='facts_snd_set')
+
+    def save(self, *args, **kwargs):
+        if 'saving_reverse' not in kwargs:
+            reverse_relation = FactFactRelation(fact=self.fact_2, fact_2=self.fact, relation_type=self.relation_type)
+            kwargs['saving_reverse'] = True
+            reverse_relation.save(*args, **kwargs)
+        del kwargs['saving_reverse']
+        return super(FactFactRelation, self).save(self, *args, **kwargs)
 
     class Meta:
         unique_together = ('fact', 'fact_2')

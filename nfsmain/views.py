@@ -9,6 +9,7 @@ def index(request):
     template_name = "nfsmain/index.html"
     return render(request, template_name)
 
+
 @login_required()
 def admin(request):
     template_name = "nfsmain/admin.html"
@@ -59,8 +60,9 @@ class SpeakerDetailView(DetailView):
 
 class StatementCreateView(CreateView):
     model = Statement
-    fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag', 'statements',
-              'facts']
+    fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
+
+
 
 
 class StatementListView(ListView):
