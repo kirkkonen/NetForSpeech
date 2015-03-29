@@ -16,29 +16,26 @@ def admin(request):
     return render(request, template_name)
 
 
-class RelationCreateViewMixIn():
+class InlineFormsetCreateViewMixIn():
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['ir_formset'] = self.inner_relation_formset_class(self.request.POST or None)
-        context['cr_formset'] = self.cross_relation_formset_class(self.request.POST or None)
+        for formset in self.inline_formsets:
+            context[formset] = self.inline_formsets[formset](self.request.POST or None)
         return context
 
     def form_valid(self, form):
         self.object = form.save()
-        ir_formset = self.inner_relation_formset_class(self.request.POST, instance=self.object)
-        if ir_formset.is_valid():
-            ir_formset.save()
-        cr_formset = self.cross_relation_formset_class(self.request.POST, instance=self.object)
-        if cr_formset.is_valid():
-            cr_formset.save()
+        for formset in self.inline_formsets:
+            formset_object = self.inline_formsets[formset](self.request.POST, instance=self.object)
+            if formset_object.is_valid():
+                formset_object.save()
         return super().form_valid(form)
 
 
-class FactCreateView(RelationCreateViewMixIn, CreateView):
+class FactCreateView(InlineFormsetCreateViewMixIn, CreateView):
     model = Fact
     fields = ['text', 'datestamp', 'timestamp', 'source_url']
-    inner_relation_formset_class = FactFactFormset
-    cross_relation_formset_class = FactStatementFormset
+    inline_formsets = {'fact_fact_formset': FactFactFormset, 'fact_statement_formset': FactStatementFormset}
 
 
 class FactListView(ListView):
@@ -49,9 +46,10 @@ class FactDetailView(DetailView):
     model = Fact
 
 
-class SpeakerCreateView(CreateView):
+class SpeakerCreateView(InlineFormsetCreateViewMixIn, CreateView):
     model = Speaker
     fields = ['index_name', 'secondary_names', 'other_names', 'birth_date', 'current_work', 'previous_work']
+    inline_formsets = {'personal_link_formset': PersonalLinkFormset}
 
 
 class SpeakerListView(ListView):
@@ -62,11 +60,11 @@ class SpeakerDetailView(DetailView):
     model = Speaker
 
 
-class StatementCreateView(RelationCreateViewMixIn, CreateView):
+class StatementCreateView(InlineFormsetCreateViewMixIn, CreateView):
     model = Statement
     fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
-    inner_relation_formset_class = StatementStatementFormset
-    cross_relation_formset_class = StatementFactFormset
+    inline_formsets = {'statement_statement_formset': StatementStatementFormset,
+                       'statement_fact_formset': StatementFactFormset}
 
 
 class StatementListView(ListView):

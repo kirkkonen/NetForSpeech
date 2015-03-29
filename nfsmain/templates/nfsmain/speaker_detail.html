@@ -3,10 +3,27 @@
 {% block pagebody %}
     <h1>Спикер</h1>
     <p>{{ speaker }}</p>
-    <p>Родился {{ speaker.birth_date }} </p>
-    <p>Сейчас работает на {{ speaker.current_work }}</p>
-    <p>Раньше работал:</p>
-    <ul>{% for work in speaker.previous_work.all %}
-    <li>{{ work }}</li>
-    {% endfor %}</ul>
+
+    {% if speaker.birth_date %}
+        <p>Родился {{ speaker.birth_date }} </p>
+    {% endif %}
+
+    {% if speaker.current_work %}
+        <p>Сейчас работает на {{ speaker.current_work }}</p>
+    {% endif %}
+
+    {% for work in speaker.previous_work.all %}
+        {% if forloop.first %}<p>Раньше работал:</p>
+        <ul>{% endif %}
+        <li>{{ work }}</li>
+        {% if forloop.last %}</ul>{% endif %}
+    {% endfor %}
+
+    {% for link in speaker.personallink_set.all %}
+        {% if forloop.first %}<p>Личные ресурсы:</p>
+        <ul>{% endif %}
+        <li>{{ link.get_type_display }}: {{ link.uri }}</li>
+        {% if forloop.last %}</ul>{% endif %}
+    {% endfor %}
+    </ul>
 {% endblock %}
