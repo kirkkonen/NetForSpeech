@@ -10,4 +10,15 @@
     <ul>
         <li>{{ statement.theme_tag }}</li>
     </ul>
+
+    {% for rel_smnt in statement.statements_fst_set.all %}
+        {% if forloop.first %}<h3>Связанные высказывания</h3>{% endif %}
+        <p>{{ rel_smnt.statement_2 }} — {{ rel_smnt.get_relation_type_display }}</p>
+    {% endfor %}
+
+    {% for rel_fact in statement.factstatementrelation_set.all %}
+        {% if forloop.first %}<h3>Связанные факты</h3>{% endif %}
+        <p>{{ rel_fact.fact }} — {{ rel_fact.get_relation_type_display }}</p>
+    {% endfor %}
+
 {% endblock %}

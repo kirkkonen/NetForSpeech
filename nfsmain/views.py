@@ -9,15 +9,36 @@ def index(request):
     template_name = "nfsmain/index.html"
     return render(request, template_name)
 
+
 @login_required()
 def admin(request):
     template_name = "nfsmain/admin.html"
     return render(request, template_name)
 
 
-class FactCreateView(CreateView):
+class RelationCreateViewMixIn():
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ir_formset'] = self.inner_relation_formset_class(self.request.POST or None)
+        context['cr_formset'] = self.cross_relation_formset_class(self.request.POST or None)
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save()
+        ir_formset = self.inner_relation_formset_class(self.request.POST, instance=self.object)
+        if ir_formset.is_valid():
+            ir_formset.save()
+        cr_formset = self.cross_relation_formset_class(self.request.POST, instance=self.object)
+        if cr_formset.is_valid():
+            cr_formset.save()
+        return super().form_valid(form)
+
+
+class FactCreateView(RelationCreateViewMixIn, CreateView):
     model = Fact
     fields = ['text', 'datestamp', 'timestamp', 'source_url']
+    inner_relation_formset_class = FactFactFormset
+    cross_relation_formset_class = FactStatementFormset
 
 
 class FactListView(ListView):
@@ -41,9 +62,11 @@ class SpeakerDetailView(DetailView):
     model = Speaker
 
 
-class StatementCreateView(CreateView):
+class StatementCreateView(RelationCreateViewMixIn, CreateView):
     model = Statement
     fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
+    inner_relation_formset_class = StatementStatementFormset
+    cross_relation_formset_class = StatementFactFormset
 
 
 class StatementListView(ListView):

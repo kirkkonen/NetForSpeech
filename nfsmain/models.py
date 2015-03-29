@@ -1,12 +1,11 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from datetime import date
 
 # Create your models here.
 
 
-class ManagedEntity():
+class ManagedEntityMixIn():
     # submitted_by = models.ForeignKey()
     submitted_at = models.DateField(auto_now_add=True)
 
@@ -77,7 +76,7 @@ class Speaker(models.Model):
 class ThemeTag(models.Model):
     caption = models.CharField(max_length=128)
 
-
+# TODO Убрать другую сторону related_name для всех наследников Record
 class Record(models.Model):
     text = models.TextField()
     datestamp = models.DateField(default=timezone.now)
@@ -89,6 +88,7 @@ class Record(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
+        # Сначала проверяем, существует ли СМИ, если нужно - создаём
         medias = Media.objects.all()
 
         for media in medias:
@@ -101,13 +101,9 @@ class Record(models.Model):
         self.media = media
         super(Record, self).save(*args, **kwargs)
 
-
-class Fact(Record):
-    def __str__(self):
-        return '«{}...» от {}'.format(self.text[:50], self.media)
-
-    def get_absolute_url(self):
-        return reverse('main:fact_detail', kwargs={'pk': self.pk})
+    def related(self):
+        return 'Противоречивых фактов: {}, высказываний: {}. ' \
+               'Подтверждающих фактов: {}, высказываний: {}'.format(*self.related_count())
 
 
 class Statement(Record):
@@ -115,9 +111,89 @@ class Statement(Record):
     speaker = models.ForeignKey(Speaker)
     communication = models.CharField(max_length=256, blank=True)
     # communication = models.ForeignKey(Communication)
+    statements = models.ManyToManyField('self', blank=True, through='StatementStatementRelation', symmetrical=False)
 
     def __str__(self):
         return '«{}...» от {}'.format(self.text[:50], self.speaker)
 
     def get_absolute_url(self):
         return reverse('main:statement_detail', kwargs={'pk': self.pk})
+
+    def related_count(self):
+        return [
+            self.factstatementrelation_set.filter(relation_type='C').count(),  # факты, противоречащие высказыванию
+            self.statements_fst_set.filter(relation_type='C').count(),  # высказывания, противоречащие высказыванию
+            self.factstatementrelation_set.filter(relation_type='A').count(),  # факты, подтверждающие высказывание
+            self.statements_fst_set.filter(relation_type='A').count(),  # высказывания, подтверждающие высказывание
+        ]
+
+
+class Fact(Record):
+    statements = models.ManyToManyField(Statement, blank=True, through='FactStatementRelation')
+    facts = models.ManyToManyField('self', blank=True, through='FactFactRelation', symmetrical=False)
+
+    def __str__(self):
+        return '«{}...» от {}'.format(self.text[:50], self.media)
+
+    def get_absolute_url(self):
+        return reverse('main:fact_detail', kwargs={'pk': self.pk})
+
+    def related_count(self):
+        return [
+            self.facts_fst_set.filter(relation_type='C').count(),  # факты, противоречащие факту
+            self.factstatementrelation_set.filter(relation_type='C').count(),  # высказывания, противоречащие факту
+            self.facts_fst_set.filter(relation_type='A').count(),  # факты, подтверждающие факт
+            self.factstatementrelation_set.filter(relation_type='A').count(),  # высказывания, подтверждающие факт
+        ]
+
+
+class RecordRelation(models.Model):
+    relation_type = models.CharField(choices=[('C', 'Противоречит'), ('A', 'Соответствует')], max_length=1)
+
+    class Meta:
+        abstract = True
+
+
+class SymmetricalRelationMixIn():
+    pass
+
+
+class FactStatementRelation(RecordRelation):
+    statement = models.ForeignKey(Statement)
+    fact = models.ForeignKey(Fact)
+
+    class Meta:
+        unique_together = ('statement', 'fact')
+
+
+class StatementStatementRelation(RecordRelation):
+    statement = models.ForeignKey(Statement, related_name='statements_fst_set')
+    statement_2 = models.ForeignKey(Statement, related_name='statements_snd_set')
+
+    def save(self, *args, **kwargs):
+        if 'saving_reverse' not in kwargs:
+            reverse_relation = StatementStatementRelation(statement=self.statement_2, statement_2=self.statement,
+                                                          relation_type=self.relation_type)
+            kwargs['saving_reverse'] = True
+            reverse_relation.save(*args, **kwargs)
+        del kwargs['saving_reverse']
+        return super(StatementStatementRelation, self).save(self, *args, **kwargs)
+
+    class Meta:
+        unique_together = ('statement', 'statement_2')
+
+
+class FactFactRelation(RecordRelation):
+    fact = models.ForeignKey(Fact, related_name='facts_fst_set')
+    fact_2 = models.ForeignKey(Fact, related_name='facts_snd_set')
+
+    def save(self, *args, **kwargs):
+        if 'saving_reverse' not in kwargs:
+            reverse_relation = FactFactRelation(fact=self.fact_2, fact_2=self.fact, relation_type=self.relation_type)
+            kwargs['saving_reverse'] = True
+            reverse_relation.save(*args, **kwargs)
+        del kwargs['saving_reverse']
+        return super(FactFactRelation, self).save(self, *args, **kwargs)
+
+    class Meta:
+        unique_together = ('fact', 'fact_2')

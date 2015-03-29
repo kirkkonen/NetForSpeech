@@ -5,6 +5,7 @@
     {% for statement in statement_list %}
         <p><a href = "{% url 'main:statement_detail' statement.id %}">«{{ statement.text|truncatewords:10 }}»</a><br />
         от <a href="{% url 'main:speaker_detail' statement.speaker.id %}">{{ statement.speaker }}</a><br />
-        Опубликовано: <a href = "{{ statement.media.home_url }}">{{ statement.media }}</a></p>
+        Опубликовано: <a href = "{{ statement.media.home_url }}">{{ statement.media }}</a><br />
+        {{ statement.related }}</p>
     {% endfor %}
 {% endblock %}
