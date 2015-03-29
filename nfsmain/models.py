@@ -58,12 +58,20 @@ class Speech(CommunicationMixIn, models.Model):
     origin = models.ForeignKey(Event)
 
 
+PERSONAL_LINK_TYPES = [
+    ('FB', 'Facebook'),
+    ('VK', 'Вконтакте'),
+    ('TW', 'Twitter'),
+    ('GB', 'Личный блог'),
+]
+
+
 class Speaker(models.Model):
     index_name = models.CharField(max_length=256)
     secondary_names = models.CharField(max_length=256)
     other_names = models.CharField(max_length=256, blank=True)
     birth_date = models.DateField(blank=True, null=True)
-    current_work = models.ForeignKey(Organisation, blank=True, related_name='employee_current_set')
+    current_work = models.ForeignKey(Organisation, blank=True, null=True, related_name='employee_current_set')
     previous_work = models.ManyToManyField(Organisation, blank=True, related_name='employee_former_set')
 
     def __str__(self):
@@ -73,8 +81,15 @@ class Speaker(models.Model):
         return reverse('main:speaker_detail', kwargs={'pk': self.pk})
 
 
+class PersonalLink(models.Model):
+    type = models.CharField(choices=PERSONAL_LINK_TYPES, max_length=2)
+    uri = models.CharField(max_length=512)
+    speaker = models.ForeignKey(Speaker)
+
+
 class ThemeTag(models.Model):
     caption = models.CharField(max_length=128)
+
 
 # TODO Убрать другую сторону related_name для всех наследников Record
 class Record(models.Model):

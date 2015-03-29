@@ -10,3 +10,5 @@ FactStatementFormset = inlineformset_factory(Fact, FactStatementRelation, exclud
 StatementStatementFormset = inlineformset_factory(Statement, StatementStatementRelation, exclude=[], extra=2,
                                                   fk_name='statement_2')
 StatementFactFormset = inlineformset_factory(Statement, FactStatementRelation, exclude=[], extra=2)
+
+PersonalLinkFormset = inlineformset_factory(Speaker, PersonalLink, exclude=[])
