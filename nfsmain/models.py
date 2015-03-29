@@ -101,17 +101,9 @@ class Record(models.Model):
         self.media = media
         super(Record, self).save(*args, **kwargs)
 
-    def related_count(self):
-        return (
-            self.facts_fst_set.filter(relation_type='C').count(),
-            self.factstatementrelation_set.filter(relation_type='C').count(),
-            self.facts_fst_set.filter(relation_type='A').count(),
-            self.factstatementrelation_set.filter(relation_type='A').count(),
-        )
-
     def related(self):
-        return 'Противоречивых фактов: {}, высказываний: {}.' \
-               ' Подтверждающих фактов: {}, высказываний: {}'.format(*self.related_count())
+        return 'Противоречивых фактов: {}, высказываний: {}. ' \
+               'Подтверждающих фактов: {}, высказываний: {}'.format(*self.related_count())
 
 
 class Statement(Record):
@@ -127,6 +119,14 @@ class Statement(Record):
     def get_absolute_url(self):
         return reverse('main:statement_detail', kwargs={'pk': self.pk})
 
+    def related_count(self):
+        return [
+            self.factstatementrelation_set.filter(relation_type='C').count(),  # факты, противоречащие высказыванию
+            self.statements_fst_set.filter(relation_type='C').count(),  # высказывания, противоречащие высказыванию
+            self.factstatementrelation_set.filter(relation_type='A').count(),  # факты, подтверждающие высказывание
+            self.statements_fst_set.filter(relation_type='A').count(),  # высказывания, подтверждающие высказывание
+        ]
+
 
 class Fact(Record):
     statements = models.ManyToManyField(Statement, blank=True, through='FactStatementRelation')
@@ -137,6 +137,14 @@ class Fact(Record):
 
     def get_absolute_url(self):
         return reverse('main:fact_detail', kwargs={'pk': self.pk})
+
+    def related_count(self):
+        return [
+            self.facts_fst_set.filter(relation_type='C').count(),  # факты, противоречащие факту
+            self.factstatementrelation_set.filter(relation_type='C').count(),  # высказывания, противоречащие факту
+            self.facts_fst_set.filter(relation_type='A').count(),  # факты, подтверждающие факт
+            self.factstatementrelation_set.filter(relation_type='A').count(),  # высказывания, подтверждающие факт
+        ]
 
 
 class RecordRelation(models.Model):
@@ -163,9 +171,9 @@ class StatementStatementRelation(RecordRelation):
     statement_2 = models.ForeignKey(Statement, related_name='statements_snd_set')
 
     def save(self, *args, **kwargs):
-        if 'saving_reverse' not in StatementStatementRelation:
-            reverse_relation = FactFactRelation(statement=self.statement_2, statement_2=self.statement,
-                                                relation_type=self.relation_type)
+        if 'saving_reverse' not in kwargs:
+            reverse_relation = StatementStatementRelation(statement=self.statement_2, statement_2=self.statement,
+                                                          relation_type=self.relation_type)
             kwargs['saving_reverse'] = True
             reverse_relation.save(*args, **kwargs)
         del kwargs['saving_reverse']

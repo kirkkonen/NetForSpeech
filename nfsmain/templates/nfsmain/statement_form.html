@@ -4,7 +4,17 @@
     <h1>Описание высказывания</h1>
         <form action="" method="post">
             {% csrf_token %}
+            {{ ir_formset.management_form }}
+            {{ cr_formset.management_form }}
             {{ form.as_p }}
+            <h3>Связанные высказывания</h3>
+            {% for statement_statement_form in ir_formset %}
+                {{ statement_statement_form.as_p }}
+            {% endfor %}
+            <h3>Связанные факты</h3>
+            {% for statement_fact_form in cr_formset %}
+                {{ statement_fact_form.as_p }}
+            {% endfor %}
             <input type="submit" value="Добавить" />
         </form>
 {% endblock %}

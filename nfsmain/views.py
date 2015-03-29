@@ -16,25 +16,29 @@ def admin(request):
     return render(request, template_name)
 
 
-class FactCreateView(CreateView):
-    model = Fact
-    fields = ['text', 'datestamp', 'timestamp', 'source_url']
-
+class RelationCreateViewMixIn():
     def get_context_data(self, **kwargs):
-        context = super(FactCreateView, self).get_context_data(**kwargs)
-        context['fact_fact_formset'] = FactFactFormset(self.request.POST or None)
-        context['fact_statement_formset'] = FactStatementFormset(self.request.POST or None)
+        context = super().get_context_data(**kwargs)
+        context['ir_formset'] = self.inner_relation_formset_class(self.request.POST or None)
+        context['cr_formset'] = self.cross_relation_formset_class(self.request.POST or None)
         return context
 
     def form_valid(self, form):
         self.object = form.save()
-        fact_fact_formset = FactFactFormset(self.request.POST, instance=self.object)
-        if fact_fact_formset.is_valid():
-            fact_fact_formset.save()
-        fact_statement_formset = FactStatementFormset(self.request.POST, instance=self.object)
-        if fact_statement_formset.is_valid():
-            fact_statement_formset.save()
-        return super(FactCreateView, self).form_valid(form)
+        ir_formset = self.inner_relation_formset_class(self.request.POST, instance=self.object)
+        if ir_formset.is_valid():
+            ir_formset.save()
+        cr_formset = self.cross_relation_formset_class(self.request.POST, instance=self.object)
+        if cr_formset.is_valid():
+            cr_formset.save()
+        return super().form_valid(form)
+
+
+class FactCreateView(RelationCreateViewMixIn, CreateView):
+    model = Fact
+    fields = ['text', 'datestamp', 'timestamp', 'source_url']
+    inner_relation_formset_class = FactFactFormset
+    cross_relation_formset_class = FactStatementFormset
 
 
 class FactListView(ListView):
@@ -58,11 +62,11 @@ class SpeakerDetailView(DetailView):
     model = Speaker
 
 
-class StatementCreateView(CreateView):
+class StatementCreateView(RelationCreateViewMixIn, CreateView):
     model = Statement
     fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
-
-
+    inner_relation_formset_class = StatementStatementFormset
+    cross_relation_formset_class = StatementFactFormset
 
 
 class StatementListView(ListView):
