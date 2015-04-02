@@ -96,8 +96,6 @@ class Record(models.Model):
     text = models.TextField()
     datestamp = models.DateField(default=timezone.now)
     timestamp = models.TimeField(blank=True, null=True)
-    source_url = models.CharField(max_length=2048)
-    media = models.ForeignKey(Media, blank=True)
 
     class Meta:
         abstract = True
@@ -127,6 +125,7 @@ class Statement(Record):
     communication = models.CharField(max_length=256, blank=True)
     # communication = models.ForeignKey(Communication)
     statements = models.ManyToManyField('self', blank=True, through='StatementStatementRelation', symmetrical=False)
+    media = models.ManyToManyField(Media, blank=True, through='StatementInMedia')
 
     def __str__(self):
         return '«{}...» от {}'.format(self.text[:50], self.speaker)
@@ -146,6 +145,7 @@ class Statement(Record):
 class Fact(Record):
     statements = models.ManyToManyField(Statement, blank=True, through='FactStatementRelation')
     facts = models.ManyToManyField('self', blank=True, through='FactFactRelation', symmetrical=False)
+    media = models.ManyToManyField(Media, blank=True, through='FactInMedia')
 
     def __str__(self):
         return '«{}...» от {}'.format(self.text[:50], self.media)
@@ -160,6 +160,22 @@ class Fact(Record):
             self.facts_fst_set.filter(relation_type='A').count(),  # факты, подтверждающие факт
             self.factstatementrelation_set.filter(relation_type='A').count(),  # высказывания, подтверждающие факт
         ]
+
+
+class RecordInMedia(models.Model):
+    source_url = models.CharField(max_length=2048)
+    media = models.ForeignKey(Media)
+
+    class Meta:
+        abstract = True
+
+
+class FactInMedia(RecordInMedia):
+    fact = models.ForeignKey(Fact)
+
+
+class StatementInMedia(RecordInMedia):
+    statement = models.ForeignKey(Statement)
 
 
 class RecordRelation(models.Model):
