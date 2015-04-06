@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import CreateView, ListView, DetailView
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 
 from nfsmain.forms import *
 
@@ -19,17 +20,41 @@ def admin(request):
 class InlineFormsetCreateViewMixIn():
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        for formset in self.inlines:
-            context[formset] = self.inlines[formset](self.request.POST or None)
+        formsets = kwargs.get('formsets')
+        if formsets:
+            for formset_class in self.inlines:
+                context[formset_class] = formsets[formset_class]
+        else:
+            for formset_class in self.inlines:
+                context[formset_class] = self.inlines[formset_class]()
         return context
 
-    def form_valid(self, form):
-        self.object = form.save()
-        for formset in self.inlines:
-            formset_object = self.inlines[formset](self.request.POST, instance=self.object)
-            if formset_object.is_valid():
-                formset_object.save()
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        formsets = {}
+        if form.is_valid():
+            formset_errors = False
+            self.object = form.save(commit=False)
+            for formset_class in self.inlines:
+                formsets[formset_class] = self.inlines[formset_class](self.request.POST, instance=self.object)
+                if not formsets[formset_class].is_valid():
+                    formset_errors = True
+            if formset_errors:
+                return self.form_invalid(form, formsets)
+            else:
+                return self.form_valid(form, formsets)
+        else:
+            return self.form_invalid(form, formsets)
+
+    def form_valid(self, form, formsets):
+        self.object.save()
+        for formset_class in formsets:
+            formsets[formset_class].save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form, formsets):
+        return self.render_to_response(self.get_context_data(form=form, formsets=formsets))
 
 
 class FactCreateView(InlineFormsetCreateViewMixIn, CreateView):
@@ -37,8 +62,6 @@ class FactCreateView(InlineFormsetCreateViewMixIn, CreateView):
     fields = ['text', 'datestamp', 'timestamp']
     inlines = {'fact_fact_formset': FactFactFormset, 'fact_statement_formset': FactStatementFormset,
                'fact_in_media_formset': FactInMediaFormset}
-
-
 
 
 class FactListView(ListView):
