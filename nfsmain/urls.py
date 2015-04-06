@@ -18,4 +18,5 @@ urlpatterns = \
              url(r'^organisations/$', views.OrganisationListView.as_view(), name='organisation_list'),
              url(r'^organisations/add/$', views.OrganisationCreateView.as_view(), name='organisation_add'),
              url(r'^organisations/(?P<pk>\d+)$', views.OrganisationDetailView.as_view(), name='organisation_detail'),
+             url(r'^test/$', views.FIM.as_view())
              )

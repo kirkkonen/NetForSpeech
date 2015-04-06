@@ -19,14 +19,14 @@ def admin(request):
 class InlineFormsetCreateViewMixIn():
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        for formset in self.inline_formsets:
-            context[formset] = self.inline_formsets[formset](self.request.POST or None)
+        for formset in self.inlines:
+            context[formset] = self.inlines[formset](self.request.POST or None)
         return context
 
     def form_valid(self, form):
         self.object = form.save()
-        for formset in self.inline_formsets:
-            formset_object = self.inline_formsets[formset](self.request.POST, instance=self.object)
+        for formset in self.inlines:
+            formset_object = self.inlines[formset](self.request.POST, instance=self.object)
             if formset_object.is_valid():
                 formset_object.save()
         return super().form_valid(form)
@@ -34,8 +34,11 @@ class InlineFormsetCreateViewMixIn():
 
 class FactCreateView(InlineFormsetCreateViewMixIn, CreateView):
     model = Fact
-    fields = ['text', 'datestamp', 'timestamp', 'source_url']
-    inline_formsets = {'fact_fact_formset': FactFactFormset, 'fact_statement_formset': FactStatementFormset}
+    fields = ['text', 'datestamp', 'timestamp']
+    inlines = {'fact_fact_formset': FactFactFormset, 'fact_statement_formset': FactStatementFormset,
+               'fact_in_media_formset': FactInMediaFormset}
+
+
 
 
 class FactListView(ListView):
@@ -49,7 +52,7 @@ class FactDetailView(DetailView):
 class SpeakerCreateView(InlineFormsetCreateViewMixIn, CreateView):
     model = Speaker
     fields = ['index_name', 'secondary_names', 'other_names', 'birth_date', 'current_work', 'previous_work']
-    inline_formsets = {'personal_link_formset': PersonalLinkFormset}
+    inlines = {'personal_link_formset': PersonalLinkFormset}
 
 
 class SpeakerListView(ListView):
@@ -63,8 +66,13 @@ class SpeakerDetailView(DetailView):
 class StatementCreateView(InlineFormsetCreateViewMixIn, CreateView):
     model = Statement
     fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
-    inline_formsets = {'statement_statement_formset': StatementStatementFormset,
-                       'statement_fact_formset': StatementFactFormset}
+    inlines = {'statement_statement_formset': StatementStatementFormset,
+               'statement_fact_formset': StatementFactFormset}
+
+
+class FIM(CreateView):
+    model = FactInMedia
+    fields = ['source_url', 'fact']
 
 
 class StatementListView(ListView):

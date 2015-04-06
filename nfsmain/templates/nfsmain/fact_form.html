@@ -4,14 +4,20 @@
     <h1>Описание нового факта</h1>
         <form action="" method="post">
             {% csrf_token %}
-            {{ fact_fact_formset.management_form }}
-            {{ fact_statement_formset.management_form }}
+            {{ fact_in_media_formset.management_form }}
             {{ form.as_p }}
+            <h3>Ссылки на публикации</h3>
+
+            {% for fact_in_media_form in fact_in_media_formset %}
+                {{ fact_in_media_form.as_p }}
+            {% endfor %}
             <h3>Связанные факты</h3>
+            {{ fact_fact_formset.management_form }}
             {% for fact_fact_form in fact_fact_formset %}
                 {{ fact_fact_form.as_p }}
             {% endfor %}
             <h3>Связанные высказывания</h3>
+            {{ fact_statement_formset.management_form }}
             {% for fact_statement_form in fact_statement_formset %}
                 {{ fact_statement_form.as_p }}
             {% endfor %}

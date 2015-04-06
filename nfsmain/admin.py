@@ -1,4 +1,5 @@
 from django.contrib import admin
+from nfsmain.formset_ex import RequiredInlineFormSet
 
 import nfsmain.models
 
@@ -20,10 +21,22 @@ class FactStatementRelationInline(admin.StackedInline):
     extra = 1
 
 
+class FactInMediaInline(admin.StackedInline):
+    model = nfsmain.models.FactInMedia
+    extra = 1
+    exclude = ('media', )
+    formset = RequiredInlineFormSet
+
+
+class FactInMediaAdmin(admin.ModelAdmin):
+    exclude = ('media', )
+
+
 class FactAdmin(admin.ModelAdmin):
     inlines = (
         FactFactRelationInline,
         FactStatementRelationInline,
+        FactInMediaInline,
         )
 
 
@@ -42,3 +55,4 @@ admin.site.register(nfsmain.models.Event)
 admin.site.register(nfsmain.models.Fact, FactAdmin)
 admin.site.register(nfsmain.models.Statement, StatementAdmin)
 admin.site.register(nfsmain.models.Speaker)
+admin.site.register(nfsmain.models.FactInMedia, FactInMediaAdmin)
