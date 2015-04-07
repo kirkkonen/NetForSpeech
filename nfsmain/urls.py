@@ -5,6 +5,7 @@ from nfsmain import views
 urlpatterns = \
     patterns('',
              url(r'^$', views.index, name='index'),
+             # url(r'^test/$', views.TestView.as_view())
              url(r'^nfsadmin/$', views.index, name='admin'),
              url(r'^facts/$', views.FactListView.as_view(), name='fact_list'),
              url(r'^facts/add/$', views.FactCreateView.as_view(), name='fact_add'),
@@ -18,5 +19,4 @@ urlpatterns = \
              url(r'^organisations/$', views.OrganisationListView.as_view(), name='organisation_list'),
              url(r'^organisations/add/$', views.OrganisationCreateView.as_view(), name='organisation_add'),
              url(r'^organisations/(?P<pk>\d+)$', views.OrganisationDetailView.as_view(), name='organisation_detail'),
-             url(r'^test/$', views.FIM.as_view())
              )

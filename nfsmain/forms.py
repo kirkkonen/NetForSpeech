@@ -10,6 +10,6 @@ StatementStatementFormset = inlineformset_factory(Statement, StatementStatementR
 StatementFactFormset = inlineformset_factory(Statement, FactStatementRelation, exclude=[], extra=2)
 
 FactInMediaFormset = inlineformset_factory(Fact, FactInMedia, fields=['source_url'], formset=RequiredInlineFormSet)
-StatementInMediaFormset = inlineformset_factory(Statement, StatementInMedia, exclude=[])
+StatementInMediaFormset = inlineformset_factory(Statement, StatementInMedia, fields=['source_url'])
 
 PersonalLinkFormset = inlineformset_factory(Speaker, PersonalLink, exclude=[])

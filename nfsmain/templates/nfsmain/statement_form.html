@@ -4,14 +4,17 @@
     <h1>Описание высказывания</h1>
         <form action="" method="post">
             {% csrf_token %}
-            {{ statement_statement_formset.management_form }}
-            {{ statement_fact_formset.management_form }}
             {{ form.as_p }}
+            <h3>Ссылки на публикации</h3>
+            {{ statement_in_media_formset.non_form_errors }}
+            {{ statement_in_media_formset.as_p }}
             <h3>Связанные высказывания</h3>
+            {{ statement_statement_formset.management_form }}
             {% for statement_statement_form in statement_statement_formset %}
                 {{ statement_statement_form.as_p }}
             {% endfor %}
             <h3>Связанные факты</h3>
+            {{ statement_fact_formset.management_form }}
             {% for statement_fact_form in statement_fact_formset %}
                 {{ statement_fact_form.as_p }}
             {% endfor %}

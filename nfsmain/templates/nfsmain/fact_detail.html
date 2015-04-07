@@ -3,7 +3,9 @@
 {% block pagebody %}
     <h1>Факт</h1>
     <p>«{{ fact.text }}»<br />
-    Обнародован {{ fact.datestamp }} в <a href = "{{ fact.source_url }}">{{ fact.media }}</a></p>
+    Обнародован {{ fact.datestamp }} в {% for media in fact.media.all %}
+        <a href="{{ media.home_url }}">{{ media.name }}</a>,
+        {% endfor %}</p>
 
     {% for rel_fact in fact.facts_set.all %}
         {% if forloop.first %}<h3>Связанные факты</h3>{% endif %}

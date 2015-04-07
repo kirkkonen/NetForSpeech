@@ -33,19 +33,19 @@ class InlineFormsetCreateViewMixIn():
         self.object = None
         form = self.get_form()
         formsets = {}
+        errors = False
         if form.is_valid():
-            formset_errors = False
             self.object = form.save(commit=False)
-            for formset_class in self.inlines:
-                formsets[formset_class] = self.inlines[formset_class](self.request.POST, instance=self.object)
-                if not formsets[formset_class].is_valid():
-                    formset_errors = True
-            if formset_errors:
-                return self.form_invalid(form, formsets)
-            else:
-                return self.form_valid(form, formsets)
         else:
+            errors = True
+        for formset_class in self.inlines:
+            formsets[formset_class] = self.inlines[formset_class](self.request.POST, instance=self.object)
+            if not formsets[formset_class].is_valid():
+                errors = True
+        if errors:
             return self.form_invalid(form, formsets)
+        else:
+            return self.form_valid(form, formsets)
 
     def form_valid(self, form, formsets):
         self.object.save()
@@ -88,14 +88,9 @@ class SpeakerDetailView(DetailView):
 
 class StatementCreateView(InlineFormsetCreateViewMixIn, CreateView):
     model = Statement
-    fields = ['speaker', 'text', 'communication', 'datestamp', 'timestamp', 'source_url', 'theme_tag']
-    inlines = {'statement_statement_formset': StatementStatementFormset,
-               'statement_fact_formset': StatementFactFormset}
-
-
-class FIM(CreateView):
-    model = FactInMedia
-    fields = ['source_url', 'fact']
+    fields = ['speaker', 'text', 'type', 'comm_type', 'comm_caption', 'datestamp', 'timestamp', 'theme_tag']
+    inlines = {'statement_statement_formset': StatementStatementFormset, 'statement_fact_formset': StatementFactFormset,
+               'statement_in_media_formset': StatementInMediaFormset}
 
 
 class StatementListView(ListView):

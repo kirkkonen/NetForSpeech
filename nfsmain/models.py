@@ -33,8 +33,17 @@ class Event(models.Model):
     name = models.CharField(max_length=512)
 
 
+COMM_TYPES = (
+    ('PB', 'Личный ресурс'),
+    ('ES', 'Речь на мероприятии'),
+    ('IV', 'Интервью'),
+    ('NS', 'Прочее'),
+)
+
+
 class Communication(models.Model):
-    pass
+    type = models.CharField(choices=COMM_TYPES, max_length=2)
+    caption = models.CharField(max_length=512)
 
 
 class CommunicationMixIn():
@@ -103,12 +112,24 @@ class Record(models.Model):
         return 'Противоречивых фактов: {}, высказываний: {}. ' \
                'Подтверждающих фактов: {}, высказываний: {}'.format(*self.related_count())
 
+STATEMENT_TYPES = (
+    ('FC', 'Прогноз'),
+    ('PR', 'Обещание'),
+    ('OP', 'Мнение'),
+    ('JK', 'Шутка'),
+    ('AV', 'Совет'),
+    ('FS', 'Факт'),
+    ('NS', 'Другое')
+)
+
 
 class Statement(Record):
     theme_tag = models.CharField(max_length=256, blank=True)
+    type = models.CharField(choices=STATEMENT_TYPES, max_length=2)
     speaker = models.ForeignKey(Speaker)
-    communication = models.CharField(max_length=256, blank=True)
     # communication = models.ForeignKey(Communication)
+    comm_type = models.CharField(choices=COMM_TYPES, max_length=2)
+    comm_caption = models.CharField(max_length=512)
     statements = models.ManyToManyField('self', blank=True, through='StatementStatementRelation', symmetrical=False)
     media = models.ManyToManyField(Media, blank=True, through='StatementInMedia')
 
@@ -133,7 +154,11 @@ class Fact(Record):
     media = models.ManyToManyField(Media, through='FactInMedia')
 
     def __str__(self):
-        return '«{}...» из {} СМИ'.format(self.text[:50], self.media.count())
+        if self.pk:
+            return '«{}...» из {} СМИ'.format(self.text[:50], self.media.count())
+        else:
+            return '«{}...»'.format(self.text[:50])
+
 
     def get_absolute_url(self):
         return reverse('main:fact_detail', kwargs={'pk': self.pk})

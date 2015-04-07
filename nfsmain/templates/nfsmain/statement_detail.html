@@ -5,7 +5,9 @@
     <p>«{{ statement.text }}»<br />
     Заявил <a href = "{% url 'main:speaker_detail' statement.speaker.id %}">{{ statement.speaker }}</a>
         (@ {{ statement.communication }})<br />
-    Обнародован {{ statement.datestamp }} в <a href = "{{ statement.source_url }}">{{ statement.media }}</a></p>
+    Обнародован {{ statement.datestamp }} в {% for media in statement.media.all %}
+        <a href="{{ media.home_url }}">{{ media.name }}</a>,
+        {% endfor %}</p>
     <p>Связанные темы:</p>
     <ul>
         <li>{{ statement.theme_tag }}</li>
