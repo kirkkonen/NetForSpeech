@@ -5,13 +5,15 @@
     <p>«{{ statement.text }}»<br />
     Заявил <a href = "{% url 'main:speaker_detail' statement.speaker.id %}">{{ statement.speaker }}</a>
         (@ {{ statement.communication }})<br />
-    Обнародован {{ statement.datestamp }} в <a href = "{{ statement.source_url }}">{{ statement.media }}</a></p>
+    Обнародован {{ statement.datestamp }} в {% for media in statement.media.all %}
+        <a href="{{ media.home_url }}">{{ media.name }}</a>,
+        {% endfor %}</p>
     <p>Связанные темы:</p>
     <ul>
         <li>{{ statement.theme_tag }}</li>
     </ul>
 
-    {% for rel_smnt in statement.statements_fst_set.all %}
+    {% for rel_smnt in statement.statements_set.all %}
         {% if forloop.first %}<h3>Связанные высказывания</h3>{% endif %}
         <p>{{ rel_smnt.statement_2 }} — {{ rel_smnt.get_relation_type_display }}</p>
     {% endfor %}

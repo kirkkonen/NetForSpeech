@@ -33,8 +33,17 @@ class Event(models.Model):
     name = models.CharField(max_length=512)
 
 
+COMM_TYPES = (
+    ('PB', 'Личный ресурс'),
+    ('ES', 'Речь на мероприятии'),
+    ('IV', 'Интервью'),
+    ('NS', 'Прочее'),
+)
+
+
 class Communication(models.Model):
-    pass
+    type = models.CharField(choices=COMM_TYPES, max_length=2)
+    caption = models.CharField(max_length=512)
 
 
 class CommunicationMixIn():
@@ -91,42 +100,38 @@ class ThemeTag(models.Model):
     caption = models.CharField(max_length=128)
 
 
-# TODO Убрать другую сторону related_name для всех наследников Record
 class Record(models.Model):
     text = models.TextField()
     datestamp = models.DateField(default=timezone.now)
     timestamp = models.TimeField(blank=True, null=True)
-    source_url = models.CharField(max_length=2048)
-    media = models.ForeignKey(Media, blank=True)
 
     class Meta:
         abstract = True
-
-    def save(self, *args, **kwargs):
-        # Сначала проверяем, существует ли СМИ, если нужно - создаём
-        medias = Media.objects.all()
-
-        for media in medias:
-            if media.home_url in self.source_url:
-                break
-        else:
-            media = Media(home_url=self.source_url)
-            media.save()
-
-        self.media = media
-        super(Record, self).save(*args, **kwargs)
 
     def related(self):
         return 'Противоречивых фактов: {}, высказываний: {}. ' \
                'Подтверждающих фактов: {}, высказываний: {}'.format(*self.related_count())
 
+STATEMENT_TYPES = (
+    ('FC', 'Прогноз'),
+    ('PR', 'Обещание'),
+    ('OP', 'Мнение'),
+    ('JK', 'Шутка'),
+    ('AV', 'Совет'),
+    ('FS', 'Факт'),
+    ('NS', 'Другое')
+)
+
 
 class Statement(Record):
     theme_tag = models.CharField(max_length=256, blank=True)
+    type = models.CharField(choices=STATEMENT_TYPES, max_length=2)
     speaker = models.ForeignKey(Speaker)
-    communication = models.CharField(max_length=256, blank=True)
     # communication = models.ForeignKey(Communication)
+    comm_type = models.CharField(choices=COMM_TYPES, max_length=2)
+    comm_caption = models.CharField(max_length=512)
     statements = models.ManyToManyField('self', blank=True, through='StatementStatementRelation', symmetrical=False)
+    media = models.ManyToManyField(Media, blank=True, through='StatementInMedia')
 
     def __str__(self):
         return '«{}...» от {}'.format(self.text[:50], self.speaker)
@@ -137,29 +142,56 @@ class Statement(Record):
     def related_count(self):
         return [
             self.factstatementrelation_set.filter(relation_type='C').count(),  # факты, противоречащие высказыванию
-            self.statements_fst_set.filter(relation_type='C').count(),  # высказывания, противоречащие высказыванию
+            self.statements_set.filter(relation_type='C').count(),  # высказывания, противоречащие высказыванию
             self.factstatementrelation_set.filter(relation_type='A').count(),  # факты, подтверждающие высказывание
-            self.statements_fst_set.filter(relation_type='A').count(),  # высказывания, подтверждающие высказывание
+            self.statements_set.filter(relation_type='A').count(),  # высказывания, подтверждающие высказывание
         ]
 
 
 class Fact(Record):
     statements = models.ManyToManyField(Statement, blank=True, through='FactStatementRelation')
     facts = models.ManyToManyField('self', blank=True, through='FactFactRelation', symmetrical=False)
+    media = models.ManyToManyField(Media, through='FactInMedia')
 
     def __str__(self):
-        return '«{}...» от {}'.format(self.text[:50], self.media)
+        if self.pk:
+            return '«{}...» из {} СМИ'.format(self.text[:50], self.media.count())
+        else:
+            return '«{}...»'.format(self.text[:50])
+
 
     def get_absolute_url(self):
         return reverse('main:fact_detail', kwargs={'pk': self.pk})
 
     def related_count(self):
         return [
-            self.facts_fst_set.filter(relation_type='C').count(),  # факты, противоречащие факту
+            self.facts_set.filter(relation_type='C').count(),  # факты, противоречащие факту
             self.factstatementrelation_set.filter(relation_type='C').count(),  # высказывания, противоречащие факту
-            self.facts_fst_set.filter(relation_type='A').count(),  # факты, подтверждающие факт
+            self.facts_set.filter(relation_type='A').count(),  # факты, подтверждающие факт
             self.factstatementrelation_set.filter(relation_type='A').count(),  # высказывания, подтверждающие факт
         ]
+
+
+class RecordInMedia(models.Model):
+    source_url = models.CharField(max_length=2048)
+    media = models.ForeignKey(Media, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        media, created = Media.objects.get_or_create(home_url__icontains=self.source_url,
+                                                     defaults={'home_url': self.source_url})
+        self.media = media
+        super().save(*args, **kwargs)
+
+
+class FactInMedia(RecordInMedia):
+    fact = models.ForeignKey(Fact)
+
+
+class StatementInMedia(RecordInMedia):
+    statement = models.ForeignKey(Statement)
 
 
 class RecordRelation(models.Model):
@@ -182,8 +214,8 @@ class FactStatementRelation(RecordRelation):
 
 
 class StatementStatementRelation(RecordRelation):
-    statement = models.ForeignKey(Statement, related_name='statements_fst_set')
-    statement_2 = models.ForeignKey(Statement, related_name='statements_snd_set')
+    statement = models.ForeignKey(Statement, related_name='statements_base_set')
+    statement_2 = models.ForeignKey(Statement, related_name='statements_set')
 
     def save(self, *args, **kwargs):
         if 'saving_reverse' not in kwargs:
@@ -199,8 +231,8 @@ class StatementStatementRelation(RecordRelation):
 
 
 class FactFactRelation(RecordRelation):
-    fact = models.ForeignKey(Fact, related_name='facts_fst_set')
-    fact_2 = models.ForeignKey(Fact, related_name='facts_snd_set')
+    fact = models.ForeignKey(Fact, related_name='facts_base_set')
+    fact_2 = models.ForeignKey(Fact, related_name='facts_set')
 
     def save(self, *args, **kwargs):
         if 'saving_reverse' not in kwargs:
