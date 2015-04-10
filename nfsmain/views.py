@@ -32,25 +32,17 @@ class InlineFormsetCreateViewMixIn():
     def post(self, request, *args, **kwargs):
         self.object = None
         form = self.get_form()
-        formsets = {}
-        errors = False
-        if form.is_valid():
-            self.object = form.save(commit=False)
-        else:
-            errors = True
-        for formset_class in self.inlines:
-            formsets[formset_class] = self.inlines[formset_class](self.request.POST, instance=self.object)
-            if not formsets[formset_class].is_valid():
-                errors = True
-        if errors:
-            return self.form_invalid(form, formsets)
-        else:
+        formsets = {formset_class: self.inlines[formset_class](self.request.POST) for formset_class in self.inlines}
+        if form.is_valid() and all(formset.is_valid() for formset in formsets):
             return self.form_valid(form, formsets)
+        else:
+            return self.form_invalid(form, formsets)
 
     def form_valid(self, form, formsets):
         self.object.save()
-        for formset_class in formsets:
-            formsets[formset_class].save()
+        for formset in formsets.values():
+            formset.instance = self.object
+            formset.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form, formsets):
